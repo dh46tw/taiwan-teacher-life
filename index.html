@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0d1b2a">
 <title>TeacherLife - 台灣教師人生模擬器</title>
-<meta name="description" content="從師培到退休，一場種子化的台灣教師生涯模擬。教檢、教甄、介聘、過勞、隱藏特性、退休——每一個決定都算數。">
+<meta name="description" content="從教育實習到退休，一場種子化的台灣教師生涯模擬。教甄、介聘、過勞、隱藏特性、退休——每一個決定都算數。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TeacherLife - 台灣教師人生模擬器">
-<meta property="og:description" content="從師培到退休，一場種子化的台灣教師生涯模擬。教檢、教甄、介聘、過勞、隱藏特性、退休——每一個決定都算數。">
+<meta property="og:description" content="從教育實習到退休，一場種子化的台灣教師生涯模擬。教甄、介聘、過勞、隱藏特性、退休——每一個決定都算數。">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TeacherLife - 台灣教師人生模擬器">
-<meta name="twitter:description" content="從師培到退休，一場種子化的台灣教師生涯模擬。教檢、教甄、介聘、過勞、隱藏特性、退休——每一個決定都算數。">
+<meta name="twitter:description" content="從教育實習到退休，一場種子化的台灣教師生涯模擬。教甄、介聘、過勞、隱藏特性、退休——每一個決定都算數。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%224%22 y=%228%22 width=%2224%22 height=%2216%22 rx=%222%22 fill=%22%23163049%22 stroke=%22%23ffc95c%22/%3E%3Cpath d=%22M9 14 L23 14 M9 18 L18 18%22 stroke=%22%23eef1ea%22 stroke-width=%221.5%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%224%22 y=%228%22 width=%2224%22 height=%2216%22 rx=%222%22 fill=%22%23163049%22 stroke=%22%23ffc95c%22/%3E%3Cpath d=%22M9 14 L23 14 M9 18 L18 18%22 stroke=%22%23eef1ea%22 stroke-width=%221.5%22/%3E%3C/svg%3E">
 
@@ -150,7 +150,7 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
     <div class="stitch"></div>
     <h1 id="logo-tap">TeacherLife<br><em>台灣教師人生模擬器</em></h1>
     <div id="ver-badge" style="position:fixed;top:6px;right:8px;font-size:10px;letter-spacing:1px;color:var(--dim);opacity:.55;font-family:monospace;z-index:50;pointer-events:none">v0.1.0</div>
-    <p class="sub">師培 → 教檢・教甄 → 介聘・職務輪替 → 過勞與退休。每一個決定都算數。</p>
+    <p class="sub">教育實習 → 教甄 → 介聘・職務輪替 → 過勞與退休。每一個決定都算數。</p>
     <div class="field"><label>教師姓名</label><input id="in-name" maxlength="10" placeholder="例如：陳靖雯" value=""></div>
     <div class="field"><label>任教科目</label>
       <div class="seg five" id="seg-subj">
@@ -161,7 +161,7 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
       <div class="seg two" id="seg-stage">
         <button data-v="國中" class="on">國中</button><button data-v="高中">高中</button>
       </div></div>
-    <button class="btn main" style="margin-top:28px" id="btn-start">開始生涯 ▸ 師培元年</button>
+    <button class="btn main" style="margin-top:28px" id="btn-start">開始生涯 ▸ 教育實習</button>
     <p class="seedline">世界種子
       <input id="seed-show" maxlength="24" style="width:120px;background:#0e2034;color:#ffc95c;border:1px solid #2b4560;border-radius:6px;padding:2px 6px;font-family:inherit;font-size:12px;text-align:center">
       · <a href="#" id="seed-re" style="color:var(--blue)">換一個</a><br>相同種子＋相同選擇＝相同人生（可直接輸入朋友的種子碼）</p>
@@ -214,13 +214,20 @@ const STAGES=['國中','高中'];
 const SUBJ_POOL={
   國文:['arm','eye'], 英文:['spd','con'], 數學:['con','eye'], 理化:['pow','con'], 社會:['arm','fld'],
 };
-const APP_VER='v0.7.1';
+const APP_VER='v0.8.0';
 
-/* ---------- 師培路線 ---------- */
-const UNIV_ROUTES={
-  A:{n:'教育大學',schools:['大安師範大學','福爾摩沙教育大學','玉山師範學院']},
-  B:{n:'一般大學＋教育學程',schools:['鳳梨田大學','日月潭大學']},
-};
+/* ---------- 大學背景（開局隨機配發，對應 WIKI 四） ---------- */
+const UNIV_TIERS=[
+  {key:'top',n:'頂大',schools:['台大','清大','交大','成大','政大','中正','中山','中央','中興'],p:10,bonus:[4,8]},
+  {key:'edu',n:'師培大學',schools:['台師大','教育大學'],p:20,bonus:[2,5],eduBoost:{rng:2,fld:2}},
+  {key:'natl',n:'一般國立大學',schools:['一般國立大學'],p:35,bonus:[0,3]},
+  {key:'priv',n:'一般私立大學',schools:['一般私立大學'],p:35,bonus:[0,0]},
+];
+function pickUnivTier(){
+  const r=R()*100; let acc=0;
+  for(const t of UNIV_TIERS){ acc+=t.p; if(r<acc)return t; }
+  return UNIV_TIERS[UNIV_TIERS.length-1];
+}
 /* ---------- 地理分級與虛構學校 ---------- */
 const TIERS=['六都','非六都','離島偏鄉'];
 const SCHOOLS={
@@ -275,6 +282,26 @@ const TEACHER_EVENTS=[
   {n:'教師社群團購／聚餐文化',for:'*',gt:'適度放鬆，同事情誼加溫',bt:'訂團購訂到忘記備課，隔天整堂課在滑手機找貨',g:{sta:1},b:{spd:-1,sta:-1,rng:-1}},
   {n:'校外演講／兼課邀約',for:'PRO',gt:'邀約安排得宜，多賺鐘點費也沒荒廢正職',bt:'行程排太滿，正課明顯備課不足',g:{sta:1},b:{rand:-1,sta:-1}},
   {n:'期中低潮／教學倦怠',for:'*',gt:'靠著調整心態走出低潮，教學信念更堅定',bt:'你開始懷疑人生，也懷疑為什麼當初沒去考公務員',g:{eye:1,cat:1,sta:1},b:{con:-1,pow:-1,sta:-1}},
+  {n:'特教生失控',for:'HR',gt:'即時應變化解衝突，班級秩序穩住下來',bt:'課堂完全失控，事後還要寫特殊事件報告到深夜',g:{spd:1,fld:1},b:{rng:-1,ow:10}},
+  {n:'家長日',for:'HR',gt:'親師溝通順暢，家長對班級經營信心大增',bt:'被家長輪番轟炸到詞窮，心理陰影面積增加',g:{arm:1},b:{sta:-1}},
+  {n:'校外教學／畢業旅行',for:'HR',gt:'帶隊全程零意外，學生玩得盡興你也鬆一口氣',bt:'行前規劃出包，隨隊處理突發狀況處理到崩潰',g:{rng:1,sta:1},b:{ow:12}},
+  {n:'學生中輟',for:'HR',gt:'家訪加資源轉介奏效，成功攔下輟學邊緣的孩子',bt:'怎麼勸都留不住，眼睜睜看著學生離開體制',g:{fld:1,eye:1},b:{fld:-1,sta:-1}},
+  {n:'班級發生偷竊事件',for:'HR',gt:'抽絲剝繭釐清真相，班級信任感重建',bt:'查無實據不了了之，班上從此人人自危',g:{spd:1,rng:1},b:{rng:-1,sta:-1}},
+  {n:'擔任科領域總召',for:'SUBJ',gt:'整合全校教學資源有成，領域教學品質全面提升',bt:'各方意見喬不攏，會開到懷疑人生',g:{con:1,cat:1},b:{ow:8}},
+  {n:'帶領學生參加校外比賽',for:'SUBJ',gt:'學生奪牌歸來，你也跟著被記嘉獎',bt:'賽前指導撞期，成績不如預期還被檢討',g:{pow:1,sta:1},b:{pow:-1,ow:6}},
+  {n:'學期排課量增加',for:'SUBJ',gt:'課雖然多但都應付過去，教學節奏沒被打亂',bt:'課排得滿滿，備課時間被壓縮到快崩潰',g:{sta:1},b:{ow:10,con:-1}},
+  {n:'大學學測報名',for:'ADMIN',gt:'報名作業零烏龍，家長學生都放心',bt:'系統操作出包，考生資料送錯梯次，賠不是賠到心累',g:{cat:1},b:{ow:10,cat:-1}},
+  {n:'學校運動會／園遊會籌辦',for:'ADMIN',gt:'活動辦得有聲有色，全校師生都說讚',bt:'流程調度大亂，典禮上出包全場看在眼裡',g:{cat:1,arm:1},b:{ow:12,sta:-1}},
+  {n:'課後輔導業務',for:'ADMIN',gt:'排課與師資喬定，家長續班率創新高',bt:'鐘點費算錯又被投訴，行政會議上被電',g:{cat:1,arm:1},b:{ow:8}},
+  {n:'主任交辦雜事',for:'ADMIN',gt:'見縫插針把雜事都處理掉，主任對你印象加分',bt:'雜事排山倒海，正課備課時間被吃光',g:{arm:1,cat:1},b:{ow:10,con:-1}},
+  {n:'新學期課表排課',for:'DIR',gt:'課表喬到皆大歡喜，全校教師難得沒抱怨',bt:'課表一公布抱怨電話接不完，改到懷疑人生',g:{cat:1,arm:1},b:{ow:12}},
+  {n:'家長投訴老師',for:'DIR',gt:'居中協調化解糾紛，老師與家長都服氣',bt:'兩邊都不領情，投訴一路燒到教育局',g:{arm:1,fld:1},b:{ow:10,sta:-2}},
+  {n:'校內考試發生疑似洩題',for:'DIR',gt:'迅速啟動調查程序，還原真相止血止損',bt:'處理程序被質疑不夠透明，鬧上家長會',g:{spd:1,cat:1},b:{ow:15,sta:-2}},
+  {n:'校內性平事件',for:'DIR',gt:'依法定程序妥善處理，保護當事人也守住程序正義',bt:'程序瑕疵被檢舉，案件驚動教育局督導',g:{cat:1,fld:1},b:{ow:15,sta:-3}},
+  {n:'民意代表替家長關說',for:'PRIN',gt:'軟硬兼施擋下不合理要求，堅守專業立場',bt:'頂不住政治壓力妥協讓步，校內士氣受挫',g:{arm:1,cat:1},b:{sta:-2,ow:10}},
+  {n:'校內事件上新聞',for:'PRIN',gt:'危機處理與媒體應對得宜，事件迅速降溫',bt:'發言被斷章取義，學校形象重創',g:{arm:1,spd:1},b:{ow:15,sta:-2}},
+  {n:'校內行政與老師對立',for:'PRIN',gt:'居中斡旋重建信任，行政教師關係回穩',bt:'雙方矛盾檯面化，校務推動舉步維艱',g:{arm:1,fld:1},b:{ow:12,sta:-2}},
+  {n:'教育局接獲針對學校的匿名檢舉',for:'PRIN',gt:'配合調查釐清疑慮，全身而退',bt:'檢舉內容部分屬實，校務評鑑遭扣分',g:{cat:1,arm:1},b:{ow:15,sta:-3}},
 ];
 
 /* ================= 遊戲狀態 ================= */
@@ -283,6 +310,12 @@ function newState(name,subject,teachStage){
   const ab={}; AB_KEYS.forEach(k=>ab[k]=ri(20,32));
   const pool=SUBJ_POOL[subject];
   ab[pool[0]]+=ri(0,6); ab[pool[1]]+=ri(0,4);
+  /* 大學背景：開局隨機配發，疊加起始能力值（對應 WIKI 四、大學背景） */
+  const univ=pickUnivTier();
+  const univBonus=ri(univ.bonus[0],univ.bonus[1]);
+  AB_KEYS.forEach(k=>ab[k]+=univBonus);
+  if(univ.eduBoost){ for(const k in univ.eduBoost)ab[k]+=univ.eduBoost[k]; }
+  const univSchool=pick(univ.schools);
   /* OOTP 式潛力天花板洗牌：60% 機率把科目權重池一項強制排到頂尖位，40% 完全隨機 */
   let sh;
   if(chance(60)){
@@ -296,15 +329,16 @@ function newState(name,subject,teachStage){
   }
   const pot={};
   sh.forEach((k,i)=>{ pot[k]= i===0?ri(72,80) : i===1?ri(64,74) : i===2?ri(56,68) : ri(46,62); });
-  return {name,subject,teachStage,age:18,year:2026,startYear:2026,phase:'師培',phaseYr:1,
+  return {name,subject,teachStage,age:23,year:2026,startYear:2026,phase:'實習',phaseYr:1,
     pot,potSum0:Object.values(pot).reduce((a,b)=>a+b,0),
     ab,carry:{},job:null,region:null,school:null,salary:0,
-    univRoute:null,univYearsTotal:0,internYears:0,teachYears:0,svc:0,
+    univTier:univ.key,univTierName:univ.n,univSchool,teachYears:0,svc:0,
     ow:0,homeroomYrsLeft:0,hrPoints:0,leadYears:0,deptYears:0,
+    hrYearsTotal:0,adminDutyYearsTotal:0,recentD:[],
     deptCandidate:false,deptOffice:null,deptOfficesHeld:{},mgmtLowStreak:0,stableYears:0,
     owBigCount:0,owStreak:0,owLeaveTaken:false,sickLeaveYears:0,intensity:null,traits:{},
     schoolYears:0,prevSchool:null,everAdmin:false,firstRegion:null,subYearsTotal:0,
-    sixCount:0,safeCount:0,partyFailCount:0,miscFailCount:0,univHonorB:false,
+    sixCount:0,safeCount:0,partyFailCount:0,miscFailCount:0,
     crisisBoldStreak:0,crisisBoldFailTotal:0,healthyStreak:0,focusStreak:0,
     bigInjEarlyCount:0,complainCount:0,refusedTransferPending:null,dictNick:null,
     svcTotal:0,leadYearsTotal:0,deptYearsTotal:0,principalYearsTotal:0,
@@ -376,14 +410,10 @@ function diceCount(base){ /* 外務纏身 -1（最低2）／學院派35%機率+1
 function genDice(baseN){
   const n=diceCount(baseN); const dice=[];
   for(let i=0;i<n;i++){ const v=rollOneDie(); dice.push(v);
-    if(v===6&&S.age<22&&!(S.traits&&S.traits.genius))bumpSixCount(); }
+    if(v===6&&S.age<26&&!(S.traits&&S.traits.genius))bumpSixCount(); }
   return dice;
 }
 function rollDice(){ const r=R(); const n=r<0.35?3:r<0.75?4:r<0.95?5:6; return genDice(n); }
-function uniDice(){ /* 一般大學＋學程路線前段加點稀疏 */
-  if(S.univRoute==='B'&&S.phaseYr<=4){ return genDice(ri(1,2)); }
-  return rollDice();
-}
 
 /* ================= UI 基礎（沿用自 YaKyoLife，機制不變） ================= */
 const $=id=>document.getElementById(id);
@@ -408,15 +438,13 @@ function divider(t){
   if(newBlocks.length>MAX_YEARS){ for(let i=0;i<newBlocks.length-MAX_YEARS;i++)newBlocks[i].remove(); }
 }
 function jobLabel(){
-  if(S.phase==='師培')return '師培生';
-  if(S.phase==='教檢')return '教檢考生';
   if(S.phase==='實習')return '實習教師';
   if(S.phase==='代理')return '代理教師';
   if(S.phase==='正職')return jobTitle()||'教師';
   return '';
 }
 function locLabel(){
-  if(S.phase==='師培')return S.school||'';
+  if(S.phase==='實習')return S.univSchool||'';
   if(S.phase==='正職')return `${S.region}・${S.school}`;
   if(S.phase==='代理')return '代理教師（無固定校）';
   return '';
@@ -520,9 +548,36 @@ function resolveEvent(ev,mode,after){
   if(!good&&ev.n==='校外演講／兼課邀約'){ S.miscFailCount=(S.miscFailCount||0)+1; checkDistract(); }
   after();
 }
+function jobTag(){ /* 身份別事件卡對應，對應 WIKI 九 */
+  return {科任:'SUBJ',導師:'HR',組長:'ADMIN',主任:'DIR',校長:'PRIN'}[S.job]||null;
+}
+/* 地理事件觸發權重（對應 WIKI 三、事件觸發權重表） */
+function regionWeight(ev){
+  const region=S.region; let w=1;
+  if(!region)return w;
+  if(region==='六都'){
+    if(['公開觀議課','全縣公開示範教學','校長／督學入班觀課','媒體採訪／教育局關注'].includes(ev.n))w*=1.6;
+  } else if(region==='非六都'){
+    if(ev.n==='學生中輟')w*=2;
+    if(ev.n==='超額介聘風聲')w*=1.5;
+  } else if(region==='離島偏鄉'){
+    if(ev.for==='ADMIN')w*=2.2;
+    if(ev.for==='HR')w*=1.4;
+  }
+  return w;
+}
+function weightedPick(items,weightFn){
+  const weights=items.map(weightFn);
+  const total=weights.reduce((a,b)=>a+b,0);
+  let r=R()*total;
+  for(let i=0;i<items.length;i++){ r-=weights[i]; if(r<=0)return items[i]; }
+  return items[items.length-1];
+}
 function drawEvent(tags,after){
   const pool=TEACHER_EVENTS.filter(e=>tags.includes(e.for));
-  const ev=pick(pool.length?pool:TEACHER_EVENTS);
+  const list=pool.length?pool:TEACHER_EVENTS;
+  const ev=weightedPick(list,regionWeight);
+  if(ev.for==='ADMIN'&&S.job!=='主任'&&S.job!=='校長')S.adminDutyYearsTotal=(S.adminDutyYearsTotal||0)+1;
   const base=eventBase(), bp=boldPen();
   choose(`事件｜${ev.n} — 你要怎麼應對？`,[
     {t:'全力一搏',warn:true,s:`成功率 ${base-bp}%｜效果最大（±3）`,f:()=>resolveEvent(ev,'bold',after)},
@@ -585,7 +640,12 @@ function owBigInjury(coreKey,cont){
   board(2);
   const f=n=>n>0?`<b class="up">+${n}</b>`:n<0?`<b class="dn">${n}</b>`:'<b>0</b>';
   card('bad','過勞倒下',`硬撐的代價來了——身心當場亮出紅燈。隔年<b class="dn">強制病假</b>。教學熱忱 ${f(net1)}、${ABL[coreKey]} ${f(net2)}。${halved?`這是你第二次因過勞倒下，教學熱忱與${ABL[coreKey]} <b class="dn">直接砍半</b>。`:''}`);
-  board(2); owAfterGamble('fail',cont);
+  board(2);
+  if(S.owBigCount>=2&&(S.svcTotal||0)>=5){
+    endGameRetire((S.svcTotal||0)>=15?'voluntarySpecial':'order');
+    return;
+  }
+  owAfterGamble('fail',cont);
 }
 function owAfterGamble(kind,cont){
   if(kind==='inject'){
@@ -685,7 +745,7 @@ const TRAIT_NAMES={
   glass:'藥罐子老師',toolMan:'工具人老師',stageFear:'上台恐懼症',distract:'外務纏身',
   windvane:'辦公室風向球',gossip:'茶水間輿論領袖',layback:'躺平教師',
 };
-/* ---------- 教學鬼才／大器晚成：師培22歲前5次擲出6、或25~31歲單年爆發成長 ---------- */
+/* ---------- 教學鬼才／大器晚成：26歲前5次擲出6、或25~31歲單年爆發成長 ---------- */
 function bumpSixCount(){
   S.sixCount=(S.sixCount||0)+1;
   if(S.sixCount>=5&&!S.traits.genius){
@@ -694,7 +754,7 @@ function bumpSixCount(){
     for(let i=cands.length-1;i>0;i--){const j=Math.floor(R()*(i+1));const t=cands[i];cands[i]=cands[j];cands[j]=t;}
     const boost=cands.slice(0,2);
     boost.forEach(k=>{ S.pot[k]=Math.min(80,(S.pot[k]||62)+10); S.ab[k]=clamp(S.ab[k]+5,1,80); });
-    card('gold','隱藏特性解鎖：教學鬼才',`師培階段 22 歲前五度擲出高標值！從今以後每顆訓練骰永久固定 <b class="hl">4 點以上</b>，事件卡好結果機率提升至 <b class="hl">70%</b>。${boost.length?'天賦覺醒：'+boost.map(k=>`${ABL[k]} <b class="up">+5</b>（潛力上限 +10）`).join('、'):''}`);
+    card('gold','隱藏特性解鎖：教學鬼才',`26 歲前五度擲出高標值！從今以後每顆訓練骰永久固定 <b class="hl">4 點以上</b>，事件卡好結果機率提升至 <b class="hl">70%</b>。${boost.length?'天賦覺醒：'+boost.map(k=>`${ABL[k]} <b class="up">+5</b>（潛力上限 +10）`).join('、'):''}`);
     board(0);
   }
 }
@@ -731,16 +791,14 @@ function checkDiscipline(){
     board(1);
   }
 }
-/* ---------- 學院派高材生：路線B學程期間拿學程優秀學生獎 ---------- */
+/* ---------- 學院派高材生：師培大學出身，教育實習期間表現優良 ---------- */
 function checkAcademyHonor(){
-  if(S.univRoute!=='B'||S.traits.academy||S.univHonorB)return;
-  if(S.phaseYr>4){
-    const prob=clamp(ovr(),15,55);
-    if(chance(prob)){
-      S.univHonorB=true; S.traits.academy=true;
-      card('gold','隱藏特性解鎖：學院派高材生','學程期間拿下「學程優秀學生獎」——25 歲前請假機率降低，開學期擲骰期望值也跟著提升。');
-      board(0);
-    }
+  if(S.univTier!=='edu'||S.traits.academy)return;
+  const prob=clamp(ovr(),15,55);
+  if(chance(prob)){
+    S.traits.academy=true;
+    card('gold','隱藏特性解鎖：學院派高材生','師培大學出身，教育實習期間表現優良——25 歲前請假機率降低，開學期擲骰期望值也跟著提升。');
+    board(0);
   }
 }
 /* ---------- 大心臟／救火隊長、辦公室風向球：危機事件全力一搏 ---------- */
@@ -868,7 +926,7 @@ function checkRetireTraits(){
   }
   if(S.phase==='代理'&&(S.subYearsTotal||0)>=20&&!S.traits.foreverSub){
     S.traits.foreverSub=true;
-    card('gold','隱藏特性解鎖：萬年代理魂','退休時仍是代理／代課教師身份，代理年資累計超過 20 年——「鐵打的代理，流水的正式教師，你就是那個永遠的伏筆。」');
+    card('gold','隱藏特性解鎖：萬年代理魂','退休時仍是代理教師身份，代理年資累計超過 20 年——「鐵打的代理，流水的正式教師，你就是那個永遠的伏筆。」');
   }
   if(!S.everAdmin&&(S.teachYears||0)>=25&&!S.traits.justTeach){
     S.traits.justTeach=true;
@@ -894,10 +952,11 @@ function checkFighterSpirit(){
 /* ---------- 年度獎項判定：每個正職學年最多一項，由高至低嘗試 ---------- */
 function rollAward(){
   const popularBoost=(S.school==='群英國中'||S.school==='雲海高中')?1.3:1;
+  const univBoost=(S.region==='六都'&&(S.univTier==='top'||S.univTier==='edu'))?1.2:1; /* 頂大／師培大學出身於六都任教，獨立疊加，不取代指標校加成 */
   for(const a of AWARDS){
     if(a.newOnly&&(S.svc||0)>2)continue;
     if(ovr()<a.min)continue;
-    const p=a.prob*(a.popular?popularBoost:1);
+    const p=a.prob*(a.popular?popularBoost*univBoost:1);
     if(chance(p)){
       const name=a.subj?`指導學生獲全國賽（${SUBJ_CONTEST[S.subject]}）`:a.n;
       const pts=Array.isArray(a.pts)?ri(a.pts[0],a.pts[1]):a.pts;
@@ -959,7 +1018,7 @@ function repInstitution(){
   return best||S.school||S.region||'';
 }
 function finalJobLabel(){
-  return S.phase==='正職' ? `${S.region}${jobTitle()}（${S.school}）` : '代理／代課教師（萬年代理）';
+  return S.phase==='正職' ? `${S.region}${jobTitle()}（${S.school}）` : '代理教師（萬年代理）';
 }
 /* 依 AWARDS 資料表與 S.awardsWon 計數，重建可讀的生涯榮譽清單 */
 function honorsList(){
@@ -1212,72 +1271,43 @@ function attemptExam(tier,cb){
 /* ================= 年度流程 ================= */
 function advanceYear(){ S.age++; S.year++; }
 function yearHeader(){
-  if(S.phase==='師培')return `${S.year} 年 · ${S.age} 歲 · 師培第 ${S.phaseYr} 年（${UNIV_ROUTES[S.univRoute].n}）`;
-  if(S.phase==='教檢')return `${S.year} 年 · ${S.age} 歲 · 教師資格檢定`;
   if(S.phase==='實習')return `${S.year} 年 · ${S.age} 歲 · 教育實習`;
-  if(S.phase==='代理')return `${S.year} 年 · ${S.age} 歲 · 代理／代課教師`;
+  if(S.phase==='代理')return `${S.year} 年 · ${S.age} 歲 · 代理教師`;
   if(S.phase==='正職')return `${S.year} 年 · ${S.age} 歲 · ${S.region}${jobTitle()}・${S.school}`;
   return `${S.year} 年 · ${S.age} 歲`;
 }
 function startYear(){
-  if(S.age>=65){ endGameSimple(); return; }
+  if(retireEligible().byAge){ endGameRetire('byAge'); return; }
   divider(yearHeader()); board(0);
   switch(S.phase){
-    case '師培': univYear(); break;
-    case '教檢': certFlow(); break;
     case '實習': internFlow(); break;
     case '代理': subYear(); break;
     case '正職': proYear(); break;
     default: subYear();
   }
 }
-/* ---------- 師培 ---------- */
-function chooseRoute(){
-  choose('選擇你的師培路線',[
-    {t:'教育大學（路線 A）',main:true,s:'4 年，每年 2 場實習/教材教法賽事高密度加點',f:()=>startRoute('A')},
-    {t:'一般大學＋教育學程（路線 B）',s:'大學 4 年＋學程 1~2 年，前段加點稀疏、學程期間回升',f:()=>startRoute('B')},
-  ]);
-}
-function startRoute(route){
-  S.univRoute=route; S.school=pick(UNIV_ROUTES[route].schools);
-  S.univYearsTotal=route==='A'?4:4+ri(1,2);
-  S.phase='師培'; S.phaseYr=1;
-  card('info','入學',`錄取 <b class="hl">${S.school}</b>，展開為期 ${S.univYearsTotal} 年的師培之路。`);
-  startYear();
-}
-function univYear(){
-  checkAcademyHonor();
-  const dice=uniDice();
-  choose('',[{t:`▸ 分配訓練成果（${dice.length} 顆骰）`,main:true,
-    f:()=>allocUI({dice},'分配師培訓練成果',(totalGot,hist)=>{
-      checkFocus(hist,totalGot);
-      S.phaseYr++; advanceYear();
-      if(S.phaseYr>S.univYearsTotal){ S.phase='教檢'; S.internYears=Math.min(S.univYearsTotal,3); }
-      startYear();
-    })}]);
-}
-/* ---------- 教檢 ---------- */
-function certFlow(){
-  const score=ovr()+Math.min(S.internYears||0,3)*2+ri(-4,4);
-  if(score>=30){
-    card('good','教師資格檢定',`評分 <b class="hl">${score}</b>（門檻30），順利取得教師證。`);
-    S.phase='實習'; startYear();
-  } else {
-    card('bad','教師資格檢定',`評分 <b class="hl">${score}</b>（門檻30），這次沒有過。`);
-    choose('',[{t:'補考（年齡 +1）',main:true,f:()=>{ advanceYear(); startYear(); }}]);
-  }
-}
-/* ---------- 教育實習 ---------- */
+/* ---------- 教育實習半年（生涯起點，對應 WIKI 六） ---------- */
 function internFlow(){
+  checkAcademyHonor();
   card('info','教育實習','為期半年的教育實習順利結束，正式取得投考教師甄試的資格。');
   S.phase='代理';
   choose('',[{t:'投入教職生涯 ▸',main:true,f:()=>startYear()}]);
 }
-/* ---------- 代理／代課教師（年度迴圈） ---------- */
+/* ---------- 代理教師（年度迴圈） ---------- */
 function subYear(){
   if(S.age>=35&&!S.everFormal){ secondLifeEnding('教到 35 歲仍未能考取正式教師資格，決定就此告別教職。'); return; }
   applyDecline();
   if(handleSickLeaveYear())return;
+  if(retireEligible().voluntary){
+    choose('是否申請本年度自願退休？',[
+      {t:'申請自願退休',warn:true,f:()=>endGameRetire('voluntary')},
+      {t:'繼續任教 ▸',main:true,f:()=>subYearContinue()},
+    ]);
+    return;
+  }
+  subYearContinue();
+}
+function subYearContinue(){
   chooseIntensity(()=>{
     const dice=rollDice();
     choose('',[{t:`▸ 分配訓練成果（${dice.length} 顆骰）`,main:true,
@@ -1292,20 +1322,30 @@ function subEnd(){
   owAccrue();
   S.salary=(S.salary||0)+PAY_SUB; S.teachYears=(S.teachYears||0)+1; S.subYearsTotal=(S.subYearsTotal||0)+1;
   checkToolMan();
-  card('info','學期末結算',`本年度以代理／代課教師身份任教，薪資 <b class="hl">${PAY_SUB}萬</b> 入帳。`);
+  card('info','學期末結算',`本年度以代理教師身份任教，薪資 <b class="hl">${PAY_SUB}萬</b> 入帳。`);
   owGamble(()=>{ examChoice(()=>{ advanceYear(); startYear(); }); });
 }
 /* ---------- 正式教師（年度迴圈） ---------- */
 function proYear(){
   applyDecline();
   if(handleSickLeaveYear())return;
+  if(retireEligible().voluntary){
+    choose('是否申請本年度自願退休？',[
+      {t:'申請自願退休',warn:true,f:()=>endGameRetire('voluntary')},
+      {t:'繼續任教 ▸',main:true,f:()=>proYearContinue()},
+    ]);
+    return;
+  }
+  proYearContinue();
+}
+function proYearContinue(){
   chooseIntensity(()=>{
     const dice=rollDice();
     choose('',[{t:`▸ 分配訓練成果（${dice.length} 顆骰）`,main:true,
       f:()=>allocUI({dice},'分配訓練成果',(totalGot,hist)=>{
         checkFocus(hist,totalGot); checkLateBloom(totalGot);
         board(1);
-        rollInjury(has=>{ if(has)drawEvent(['*','TCORE','MGMT','PRO'],proEnd); else proEnd(); }); })}]);
+        rollInjury(has=>{ if(has)drawEvent(['*','TCORE','MGMT','PRO'].concat(jobTag()?[jobTag()]:[]),proEnd); else proEnd(); }); })}]);
   });
 }
 /* ---------- 正式教師：學期末（薪資結算→導師輪替→組長邀約/導師指派→主任甄試/缺額→降調檢查→超額介聘→主動介聘） ---------- */
@@ -1325,6 +1365,8 @@ function settleSalary(next){
   const payMult=(S.traits&&S.traits.treasure)?1.2:1;
   const pay=lvRow(S.job,S.region).pay*payMult;
   S.salary=(S.salary||0)+pay; S.teachYears=(S.teachYears||0)+1; S.svc=(S.svc||0)+1; S.svcTotal=(S.svcTotal||0)+1;
+  if(S.job==='導師')S.hrYearsTotal=(S.hrYearsTotal||0)+1;
+  S.recentD=S.recentD||[]; S.recentD.push(ovr()-lvRow(S.job,S.region).par); if(S.recentD.length>3)S.recentD.shift();
   card('info','學期末結算',`本學年以 <b class="hl">${jobTitle()}</b> 身份於 <b class="hl">${S.school}</b> 任教，薪資 <b class="hl">${Math.round(pay)}萬</b> 入帳（服務年資 ${S.svc} 年）。`);
   board(2); next();
 }
@@ -1345,12 +1387,19 @@ function homeroomStep(next){
 /* 科任：可能被邀約組長，或被指派下一屆導師（互斥，優先檢查組長邀約） */
 function adminAssignStep(next){
   if(S.job!=='科任'){ next(); return; }
-  const inviteProb=clamp(Math.round(mgmtVFor('組長')*1.1),5,55);
+  const isRural=S.region==='離島偏鄉';
+  const inviteProb=clamp(Math.round(mgmtVFor('組長')*1.1)+(isRural?15:0),5,65);
   if(chance(inviteProb)){
-    choose('主任邀約你擔任組長',[
+    choose(isRural?'主任邀約你擔任組長（學校人手不足，這裡不太好婉拒）':'主任邀約你擔任組長',[
       {t:'接受邀約擔任組長',main:true,f:()=>{ S.job='組長'; S.leadYears=0; S.mgmtLowStreak=0; S.homeroomYrsLeft=0; S.everAdmin=true;
         card('gold','職務異動',`從今年起接任 <b class="hl">組長</b>。`); board(0); clearStageFearOnPromotion(); next(); }},
-      {t:'婉拒，維持現職',f:()=>{ card('info','','婉拒了這次邀約，繼續留在科任崗位。不影響未來再被邀約的機率。'); next(); }},
+      {t:'婉拒，維持現職',f:()=>{
+        if(isRural&&chance(40)){
+          S.job='組長'; S.leadYears=0; S.mgmtLowStreak=0; S.homeroomYrsLeft=0; S.everAdmin=true;
+          card('bad','職務異動','想婉拒，但校內人手實在不足——最後還是被留任組長。「無法拒絕行政」，偏鄉學校就是這樣。');
+          board(0); clearStageFearOnPromotion(); next(); return;
+        }
+        card('info','','婉拒了這次邀約，繼續留在科任崗位。不影響未來再被邀約的機率。'); next(); }},
     ]);
     return;
   }
@@ -1362,6 +1411,17 @@ function adminAssignStep(next){
   }
   next();
 }
+/* 主任報考門檻（對應 WIKI 五）：國中三選一／高中組長+導師+行政兼職年資合計滿4年 */
+function deptExamEligible(){
+  if(S.teachStage==='高中'){
+    return (S.leadYearsTotal||0)+(S.hrYearsTotal||0)+(S.adminDutyYearsTotal||0)>=4;
+  }
+  const goodRecord=(S.recentD||[]).length>=3 && S.recentD.every(d=>d>=0);
+  if((S.svcTotal||0)>=5)return true;
+  if((S.leadYearsTotal||0)>=2||(S.hrYearsTotal||0)>=3){ if(goodRecord)return true; }
+  if((S.leadYearsTotal||0)>=1&&(S.hrYearsTotal||0)>=2){ if(goodRecord)return true; }
+  return false;
+}
 /* 主任候選資格考試（可選投考）／已有候選資格則檢查出缺 */
 function deptExamOrVacancyStep(next){
   if(S.job==='校長'){ S.principalYearsTotal=(S.principalYearsTotal||0)+1; next(); return; }
@@ -1372,6 +1432,7 @@ function deptExamOrVacancyStep(next){
     return;
   }
   if(!S.deptCandidate){
+    if(!deptExamEligible()){ next(); return; }
     choose('是否參加本年度主任甄試／儲訓？',[
       {t:'參加甄試',f:()=>{
         const score=ovr()+(S.leadYears||0)*2+ri(-4,4);
@@ -1494,10 +1555,25 @@ function rollActiveTransfer(){
   board(0);
 }
 /* ---------- 引退（完整退休儀式，對應 WIKI 十二） ---------- */
-function endGameSimple(){
+/* ---------- 退休資格三分類（對應 WIKI 十二） ---------- */
+function retireEligible(){
+  const voluntary=(S.teachYears||0)>=25
+    || ((S.svcTotal||0)>=5&&S.age>=60)
+    || ((S.svcTotal||0)>=15&&(S.owBigCount||0)>=2);
+  const byAge=(S.svcTotal||0)>=5&&S.age>=65;
+  return {voluntary,byAge};
+}
+const RETIRE_TEXT={
+  byAge:{title:'屆齡退休',body:'服務年資與年齡皆已達屆齡退休門檻，學校依規定辦理退休。'},
+  voluntary:{title:'自願退休',body:'年資或年齡已達自願退休條件，決定為這段教職生涯畫下句點。'},
+  voluntarySpecial:{title:'自願退休（因公傷病）',body:'服務年資已達 15 年，且身心狀況經專業評估已不適合繼續任教——選擇以自願退休的方式，體面地告一段落。'},
+  order:{title:'命令退休',body:'服務年資已達 5 年，但身心狀況經判定已不堪勝任教學——學校依規定啟動命令退休程序。'},
+};
+function endGameRetire(kind){
   board(2);
-  divider(`${S.year} 年 · ${S.age} 歲 · 強制退休`);
-  card('gold','退休',retireSummaryHtml());
+  const t=RETIRE_TEXT[kind];
+  divider(`${S.year} 年 · ${S.age} 歲 · ${t.title}`);
+  card('gold',t.title,`${t.body}<br>${retireSummaryHtml()}`);
   endingActions();
 }
 
@@ -1526,8 +1602,9 @@ $('btn-start').onclick=()=>{
   $('start').style.display='none';
   $('board').style.display=''; $('act').style.display='';
   board(0);
-  card('info','教師誕生',`${S.year} 年，立志成為 <b class="hl">${S.subject}科</b>${S.teachStage}老師的 <b class="hl">${S.name}</b>，踏入師資培育的第一年。往後的路，要自己選。`);
-  chooseRoute();
+  card('info','教師誕生',`畢業自 <b class="hl">${S.univSchool}</b>（${S.univTierName}），立志成為 <b class="hl">${S.subject}科</b>${S.teachStage}老師的 <b class="hl">${S.name}</b>，${S.year} 年展開為期半年的教育實習。往後的路，要自己選。`);
+  divider(yearHeader()); board(0);
+  internFlow();
 };
 /* 站內確認彈窗：不依賴 window.confirm()，部分行動裝置瀏覽器／WebView 會封鎖或自動取消原生對話框，
    導致 confirm() 靜默回傳 false、按鈕看似「沒有反應」；改用獨立疊層，也不會打斷底下 #act 進行中的操作畫面 */
