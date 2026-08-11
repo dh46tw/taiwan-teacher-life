@@ -11,3 +11,15 @@
 * **榮譽與名人堂**：8 種年度獎項、CareerScore/HonorScore 生涯評價分、五級分級與典範教育家評選。
 * **人生隨機事件**：18 張教師事件卡、依分級呈現的完整退休儀式、35歲前的第二人生劇本。
 * **結算圖分享**：退休／第二人生結局可一鍵產生 Canvas 結算圖（生涯評價、能力值、榮譽、特性），支援下載或原生分享。
+
+## 本機開發
+
+程式碼以 ES module（`<script type="module">`）組織於 `src/` 底下（`data/` 靜態資料、`engine/` 規則邏輯、`ui/` 畫面渲染），部署到 GitHub Pages 時直接以純靜態檔案服務，不需要任何建置步驟。
+
+**本機測試請務必透過 HTTP server 開啟，不能直接用 Finder／檔案總管雙擊 `index.html`。** 瀏覽器會擋下 `file://` 協議下的 ES module 請求（CORS 政策），導致頁面完全無法執行。啟動方式例如：
+
+```bash
+python3 -m http.server 8000
+```
+
+啟動後開啟 `http://localhost:8000/` 即可。這個限制只影響本機開發測試，部署到 GitHub Pages（`https://`）後不受影響。
