@@ -1,19 +1,18 @@
 import { S, APP_VER } from '../engine/state.js';
 import { SEED, pick, clamp } from '../engine/rng.js';
-import { careerScoreCalc, honorScoreCalc, finalTier } from '../engine/scoring.js';
+import { totalScore, finalTier } from '../engine/summary.js';
 import { finalJobLabel, honorsList } from '../engine/summary.js';
 import { card, board, divider, choose, scrollBottom, logTarget } from './render.js';
 import { ABL, AB_KEYS } from '../data/tables.js';
-import { TRAIT_NAMES } from '../data/traits.js';
+import { TRAIT_NAMES, NEGATIVE_TRAITS } from '../data/traits.js';
 import { SECOND_LIFE } from '../data/second-life.js';
 
-/* ---------- 結算圖（Canvas 產生 PNG，對應 WIKI 十二／原作 shareImage） ---------- */
+/* ---------- 結算圖（Canvas 產生 PNG，對應 WIKI 六／原作 shareImage） ---------- */
 export function shareImage(out){
   const tier=finalTier();
-  const cs=careerScoreCalc(), hs=honorScoreCalc(), total=cs+hs;
-  const negK=['glass','toolMan','stageFear','distract','windvane','gossip','layback'];
+  const cs=Math.round(S.careerScore||0), hs=Math.round(S.honorScore||0), total=Math.round(totalScore());
   const traitKeys=Object.keys(S.traits||{}).filter(k=>S.traits[k]);
-  const traits=traitKeys.map(k=>({label:k==='dict'&&S.dictNick?S.dictNick+'活字典':(TRAIT_NAMES[k]||k),key:k,neg:negK.includes(k)}));
+  const traits=traitKeys.map(k=>({label:TRAIT_NAMES[k]||k,key:k,neg:NEGATIVE_TRAITS.includes(k)}));
   const honors=honorsList();
   const abList=AB_KEYS.map(k=>({k,label:ABL[k],v:S.ab[k],pot:(S.pot&&S.pot[k])||62}));
 
@@ -57,8 +56,7 @@ export function shareImage(out){
 
   let y=126, tagx=PAD;
   function tagColor(o){
-    if(o.key==='legend')return {bg:'#3a2c05',bd:'#ffc95c',fg:'#ffe08a'};
-    if(o.key==='liver')return {bg:'#232733',bd:'#c8d0e0',fg:'#e8eef7'};
+    if(o.key==='owBeast')return {bg:'#232733',bd:'#c8d0e0',fg:'#e8eef7'};
     if(o.neg)return {bg:'#2a0f0f',bd:'#c0392b',fg:'#ff8b7a'};
     return {bg:'#173524',bd:'#2c4f6b',fg:'#9fd8a8'};
   }
@@ -79,7 +77,7 @@ export function shareImage(out){
   c.font='bold 16px sans-serif'; c.fillStyle='#ffc95c'; c.fillText('★ '+tier,PAD,y); y+=24;
   c.font='13px monospace'; c.fillStyle='#eef1ea';
   c.fillText(`CareerScore ${Math.round(cs)}　HonorScore ${hs}`,PAD,y); y+=24;
-  c.fillText(`生涯評價分 ${Math.round(total)}`,PAD,y); y+=30;
+  c.fillText(`教育積分總分 ${Math.round(total)}`,PAD,y); y+=30;
 
   hr(); sectionTitle('生涯能力值');
   const barX=PAD+64, barW=W-PAD*2-64-46;
@@ -108,7 +106,7 @@ export function shareImage(out){
   y+=8;
 
   c.fillStyle='#ffc95c'; c.font='bold 15px sans-serif';
-  c.fillText('生涯累計薪資 '+Math.round(S.salary).toLocaleString()+' 萬元',PAD,y); y+=26;
+  c.fillText(finalJobLabel()+'｜教學年資 '+(S.teachYears||0)+' 年',PAD,y); y+=26;
   c.fillStyle='#8ea3ae'; c.font='11px monospace'; c.fillText('seed: '+SEED,PAD,H-40);
   c.textAlign='right'; c.fillText(APP_VER,W-PAD,H-40); c.textAlign='left';
 

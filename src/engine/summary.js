@@ -1,37 +1,60 @@
 import { S } from './state.js';
-import { ovr, jobTitle, careerScoreCalc, honorScoreCalc, finalTier } from './scoring.js';
-import { checkRetireTraits, checkHallOfFame, traitsSummaryHtml } from './traits-unlock.js';
-import { AWARDS, SUBJ_CONTEST } from '../data/awards.js';
+import { TIER_TABLE, BIG_AWARD_KEYS, COUNTY_OR_ABOVE_KEYS, FLAVOR, ABL, AB_KEYS, AWARDS } from '../data/tables.js';
 
-/* ---------- 代表機構／退休儀式（對應 WIKI 十二） ---------- */
-export function repInstitution(){
-  const m=S.schoolYearsMap||{}; let best=null,bestY=0;
-  for(const k in m){ if(m[k]>bestY){bestY=m[k];best=k;} }
-  return best||S.school||S.region||'';
+/* ================= 生涯結算：教育積分、5級稱號、風味詞綴（對應 WIKI 六） ================= */
+export function totalScore(){ return (S.careerScore||0)+(S.honorScore||0); }
+export function tierOf(score){
+  for(const row of TIER_TABLE){ if(score>=row.min)return row.name; }
+  return TIER_TABLE[TIER_TABLE.length-1].name;
+}
+const TIER_RANK=['一頁教育者','認真教師','資深良師','明星教師','典範教育家'];
+/* 保底規則：師鐸獎/教育奉獻獎→至少明星教師；任一縣市級以上單項獎→至少資深良師（對應 WIKI 六） */
+export function finalTier(){
+  let t=tierOf(totalScore());
+  const won=S.awardsWon||{};
+  if(BIG_AWARD_KEYS.some(k=>won[k])&&TIER_RANK.indexOf(t)<TIER_RANK.indexOf('明星教師'))t='明星教師';
+  else if(COUNTY_OR_ABOVE_KEYS.some(k=>won[k])&&TIER_RANK.indexOf(t)<TIER_RANK.indexOf('資深良師'))t='資深良師';
+  return t;
+}
+/* 風味稱號：累積投入點數最高一項；從未主動訓練過則依最終職務路線判定（對應 WIKI 六） */
+export function flavorOf(){
+  const inv=S.investedPoints||{};
+  const sorted=AB_KEYS.slice().sort((a,b)=>(inv[b]||0)-(inv[a]||0));
+  const top=sorted[0];
+  if(!top||(inv[top]||0)===0){
+    if(S.job==='校長'||S.job==='主任')return FLAVOR.adm;
+    if(S.job==='組長')return FLAVOR.com;
+    if(S.job==='導師')return FLAVOR.mgt;
+    return FLAVOR.pro;
+  }
+  return FLAVOR[top];
 }
 export function finalJobLabel(){
-  return S.phase==='正職' ? `${S.region}${jobTitle()}（${S.school}）` : '代理教師（萬年代理）';
+  if(S.phase==='代理')return '代理教師';
+  if(S.phase==='正職')return `${S.region}・${S.school}・${(S.job==='主任'&&S.deptOffice)?S.deptOffice+'主任':S.job}`;
+  return S.phase||'';
 }
-/* 依 AWARDS 資料表與 S.awardsWon 計數，重建可讀的生涯榮譽清單 */
 export function honorsList(){
-  const w=S.awardsWon||{};
-  return AWARDS.filter(a=>w[a.key]>0).map(a=>{
-    const n=a.subj?`指導學生獲全國賽（${SUBJ_CONTEST[S.subject]}）`:a.n;
-    const cnt=w[a.key];
-    return cnt>1?`${n} ×${cnt}`:n;
+  const won=S.awardsWon||{};
+  const list=[];
+  Object.keys(won).forEach(k=>{
+    if(!won[k])return;
+    if(k==='schoolMerit'){ list.push(`校內特殊表現嘉獎 ×${won[k]}`); return; }
+    const a=AWARDS[k]; if(a)list.push(a.name);
   });
-}
-export function retireCeremonyHtml(tier){
-  if(tier==='典範教育家')return `<b class="hl">${repInstitution()}</b>所在縣市政府公開表揚，教育處長親自出席歡送茶會，歷屆學生返校獻花，地方新聞報導了這段教育生涯。`;
-  if(tier==='明星教師')return `${S.school||repInstitution()}辦理退休歡送會，全校師生列隊歡送，畢業班學生自製回憶錄影片，場面感人。`;
-  if(tier==='資深良師')return `學年同事在辦公室辦了一場小小歡送茶會，收到一疊卡片與一束花，暖暖的。`;
-  return `默默辦理退休手續，只有幾個熟識的同事私下請吃一頓飯道別。不是每個人都有盛大的儀式，但每個認真教過書的人，都有學生記得。`;
+  return list;
 }
 export function retireSummaryHtml(){
-  checkRetireTraits();
-  const cs=careerScoreCalc(), hs=honorScoreCalc(), total=cs+hs, tier=finalTier();
-  const hof=checkHallOfFame();
-  return `教職生涯畫下句點。最終身份：<b class="hl">${finalJobLabel()}</b>。教學年資 ${S.teachYears||0} 年，教學評價 ${ovr()}，生涯累計薪資 ${Math.round(S.salary).toLocaleString()} 萬元。`
-    +`<div class="statline">CareerScore ${Math.round(cs)}　HonorScore ${hs}　生涯評價分 <b class="hl">${Math.round(total)}</b>　評選：<b class="hl">${tier}</b></div>`
-    +`${retireCeremonyHtml(tier)}${hof?'<br>'+hof:''}${traitsSummaryHtml()}`;
+  const cs=Math.round(S.careerScore||0), hs=Math.round(S.honorScore||0), total=Math.round(totalScore());
+  const tier=finalTier(), flavor=flavorOf();
+  const honors=honorsList();
+  const abLines=AB_KEYS.map(k=>`${ABL[k]} ${S.ab[k]}`).join('、');
+  return `
+    <div style="margin-top:10px">
+      <div style="font-size:20px;font-weight:bold;color:var(--amber)">★ ${tier}・${flavor}</div>
+      <div style="margin-top:6px">CareerScore ${cs}　HonorScore ${hs}　<b>教育積分總分 ${total}</b></div>
+      <div style="margin-top:6px;color:var(--dim)">六維能力值：${abLines}</div>
+      <div style="margin-top:6px;color:var(--dim)">生涯榮譽（${honors.length}項）：${honors.length?honors.join('、'):'無正式榮譽紀錄'}</div>
+      <div style="margin-top:6px;color:var(--dim)">${finalJobLabel()}｜${S.startYear||2026}–${S.year}｜退休時 ${S.age} 歲｜教學年資 ${S.teachYears||0} 年</div>
+    </div>`;
 }

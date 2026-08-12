@@ -1,9 +1,12 @@
-/* ---------- 隱藏特性系統（對應 WIKI 十，共 24 種）名稱對照 ---------- */
+/* ---------- 隱藏特性系統（對應 WIKI 九，共 7 種）名稱對照 ---------- */
 export const TRAIT_NAMES={
-  legend:'杏壇傳奇',soul:'校魂',dict:'活字典',ruralLight:'偏鄉之光',diligence:'天道酬勤',
-  genius:'教學鬼才',iron:'鐵飯碗不是叫假的',late:'大器晚成',disc:'自律魔人',academy:'學院派高材生',
-  foreverSub:'萬年代理魂',justTeach:'只想好好教書',treasure:'校寶',heart:'大心臟／救火隊長',
-  fighter:'打不倒的教育魂',liver:'肝帝',focus:'偏才／一心一藝',
-  glass:'藥罐子老師',toolMan:'工具人老師',stageFear:'上台恐懼症',distract:'外務纏身',
-  windvane:'辦公室風向球',gossip:'茶水間輿論領袖',layback:'躺平教師',
+  owBeast:'功勞不知道但過勞一定有',
+  ironHeart:'強心臟',
+  foreverSub:'萬年代理',
+  devoted:'敬業代表',
+  stayput:'堅守校園',
+  late:'大器晚成',
+  burnedOut:'整組壞了了',
 };
+/* 分享圖／結算頁標記負向特性用（對應 WIKI 九「負向特性」） */
+export const NEGATIVE_TRAITS=['burnedOut'];

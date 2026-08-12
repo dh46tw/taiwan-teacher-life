@@ -1,39 +1,55 @@
-/* ---------- 能力值、科目、階段、大學背景、地理分級、薪資門檻等靜態表格 ---------- */
-export const ABL={sta:'教學熱忱',con:'教材精熟',pow:'教學魅力',spd:'臨場反應',eye:'因材施教',
-  rng:'班級經營',fld:'輔導能力',arm:'溝通能力',cat:'行政能力'};
+/* ---------- 六維能力值、科目、地理分級、學校、教甄門檻等靜態表格（對應 WIKI 三、四） ---------- */
+export const ABL={hp:'健康',pas:'教學熱忱',pro:'教學能力',mgt:'班級經營',com:'溝通能力',adm:'行政能力'};
 export const AB_KEYS=Object.keys(ABL);
-export const AB_CORE=['con','pow','spd','eye'];      /* 教學核心四項 */
-export const AB_MGMT=['rng','fld','arm','cat'];       /* 職能四項 */
-export const SUBJECTS=['國文','英文','數學','理化','社會'];
-export const STAGES=['國中','高中'];
-/* 科目頂尖工具權重池：[招牌能力, 次要能力] */
-export const SUBJ_POOL={
-  國文:['arm','eye'], 英文:['spd','con'], 數學:['con','eye'], 理化:['pow','con'], 社會:['arm','fld'],
-};
 
-/* ---------- 大學背景（開局隨機配發，對應 WIKI 四、大學背景） ---------- */
-export const UNIV_TIERS=[
-  {key:'top',n:'頂大',schools:['台大','清大','交大','成大','政大','中正','中山','中央','中興'],p:10,bonus:[4,8]},
-  {key:'edu',n:'師培大學',schools:['台師大','教育大學'],p:20,bonus:[2,5],eduBoost:{rng:2,fld:2}},
-  {key:'natl',n:'一般國立大學',schools:['一般國立大學'],p:35,bonus:[0,3]},
-  {key:'priv',n:'一般私立大學',schools:['一般私立大學'],p:35,bonus:[0,0]},
-];
-/* ---------- 地理分級與虛構學校 ---------- */
+export const SUBJECTS=['國文','英文','數學','理化','社會'];
+export const STAGE='國中'; /* WIKI 限縮於國中學制 */
+
+/* ---------- 地理分級與虛構國中校名（對應 WIKI 四） ---------- */
 export const TIERS=['六都','非六都','離島偏鄉'];
 export const SCHOOLS={
-  國中:{六都:['群英國中','新鳴國中','丹霞國中','澄川國中'],非六都:['瑞華國中','靖安國中','蒼梧國中','崇安國中'],離島偏鄉:['潮音國中','燕鷗國中']},
-  高中:{六都:['雲海高中','青雲高中','明承高中','望星高中'],非六都:['東寧高中','光禾高中','清泉高中','雙溪高中'],離島偏鄉:['星砂高中','浪岬高中']},
+  六都:['群英國中','新鳴國中','丹霞國中','澄川國中'],
+  非六都:['瑞華國中','靖安國中','蒼梧國中','崇安國中'],
+  離島偏鄉:['潮音國中','燕鷗國中','星砂國中','浪岬國中'],
 };
-/* ---------- 教師甄試門檻與上榜機率公式 ---------- */
+export const POPULAR_SCHOOL='群英國中'; /* 人氣加乘校：較容易獲提名校內特殊表現嘉獎 */
+
+/* ---------- 教師甄試門檻與上榜機率公式（對應 WIKI 二） ---------- */
 export const EXAM_TH={
-  六都:{th:52,base:20,lo:5,hi:70}, 非六都:{th:44,base:35,lo:10,hi:85}, 離島偏鄉:{th:36,base:55,lo:20,hi:95},
+  六都:{th:52,base:20,lo:5,hi:70},
+  非六都:{th:44,base:35,lo:10,hi:85},
+  離島偏鄉:{th:36,base:55,lo:20,hi:95},
 };
-/* ---------- 薪資與職涯分級門檻（對應 WIKI 六、職涯分級門檻表） ---------- */
-export const PAY_SUB=55;
-export const LV_TABLE={
-  代理:{不分區:{par:32,min:26,pay:55}},
-  正式教師:{離島偏鄉:{par:38,min:32,pay:70},非六都:{par:44,min:38,pay:62},六都:{par:50,min:44,pay:60}},
-  組長:{離島偏鄉:{par:44,min:39,pay:82},非六都:{par:50,min:45,pay:75},六都:{par:56,min:51,pay:73}},
-  主任:{離島偏鄉:{par:50,min:45,pay:100},非六都:{par:56,min:51,pay:95},六都:{par:62,min:57,pay:92}},
-  校長:{離島偏鄉:{par:58,min:53,pay:140},非六都:{par:64,min:59,pay:135},六都:{par:70,min:65,pay:130}},
+
+/* ---------- 5 級終局稱號與分數門檻（對應 WIKI 六） ---------- */
+export const TIER_ORDER=['一頁教育者','認真教師','資深良師','明星教師','典範教育家'];
+export const TIER_TABLE=[
+  {name:'典範教育家',min:4000},
+  {name:'明星教師',min:2950},
+  {name:'資深良師',min:2150},
+  {name:'認真教師',min:1450},
+  {name:'一頁教育者',min:-Infinity},
+];
+
+/* ---------- 風味稱號詞綴（依累積投入點數最高一項，對應 WIKI 六） ---------- */
+export const FLAVOR={pro:'教學型',mgt:'帶班型',com:'公關型',adm:'行政通型',hp:'長青型',pas:'熱血型'};
+
+/* ---------- HonorScore 年度大獎（對應 WIKI 六） ---------- */
+export const AWARDS={
+  devotion:{name:'教育部教育奉獻獎',score:460},
+  shiduo:{name:'師鐸獎',score:420},
+  countyExcellent:{name:'特殊優良教師獎（縣市級）',score:300},
+  teachExcellence:{name:'教學卓越獎（團體，個人列名）',score:220},
+  countyGood:{name:'縣市優良教師',score:160},
+  newTeacher:{name:'新進教師獎/初任教師優良獎',score:140},
+  schoolMerit:{name:'校內特殊表現嘉獎',scoreRange:[40,70]},
+  nationalContest:{name:'指導學生獲全國賽',score:90},
+};
+/* 拿過師鐸獎或教育奉獻獎 → 至少「明星教師」；拿過任一縣市級以上單項獎 → 至少「資深良師」 */
+export const BIG_AWARD_KEYS=['devotion','shiduo'];
+export const COUNTY_OR_ABOVE_KEYS=['devotion','shiduo','countyExcellent','teachExcellence','countyGood'];
+
+/* 科目對應全國賽名稱（對應 WIKI 六） */
+export const SUBJ_CONTEST={
+  國文:'作文比賽',英文:'英語競賽',數學:'數學競賽',理化:'科展',社會:'公民行動方案',
 };

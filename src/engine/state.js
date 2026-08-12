@@ -1,55 +1,65 @@
-import { R, ri, pick, chance } from './rng.js';
-import { AB_KEYS, SUBJ_POOL, UNIV_TIERS } from '../data/tables.js';
+import { R, ri, chance } from './rng.js';
+import { AB_KEYS } from '../data/tables.js';
 
-export const APP_VER='v0.8.0';
-
-/* ---------- 大學背景（開局隨機配發，對應 WIKI 四、大學背景） ---------- */
-export function pickUnivTier(){
-  const r=R()*100; let acc=0;
-  for(const t of UNIV_TIERS){ acc+=t.p; if(r<acc)return t; }
-  return UNIV_TIERS[UNIV_TIERS.length-1];
-}
+export const APP_VER='v1.0.0-alpha';
 
 /* ================= 遊戲狀態 ================= */
 export let S=null;
 export function setState(newS){ S=newS; }
-export function newState(name,subject,teachStage){
-  const ab={}; AB_KEYS.forEach(k=>ab[k]=ri(20,32));
-  const pool=SUBJ_POOL[subject];
-  ab[pool[0]]+=ri(0,6); ab[pool[1]]+=ri(0,4);
-  /* 大學背景：開局隨機配發，疊加起始能力值（對應 WIKI 四、大學背景） */
-  const univ=pickUnivTier();
-  const univBonus=ri(univ.bonus[0],univ.bonus[1]);
-  AB_KEYS.forEach(k=>ab[k]+=univBonus);
-  if(univ.eduBoost){ for(const k in univ.eduBoost)ab[k]+=univ.eduBoost[k]; }
-  const univSchool=pick(univ.schools);
-  /* OOTP 式潛力天花板洗牌：60% 機率把科目權重池一項強制排到頂尖位，40% 完全隨機 */
+
+/* ---------- 出生設定：六維各 ri(20,32)，教學能力額外 +ri(0,6)（對應 WIKI 三） ---------- */
+function rollBirthAbilities(){
+  const ab={};
+  AB_KEYS.forEach(k=>ab[k]=ri(20,32));
+  ab.pro+=ri(0,6);
+  return ab;
+}
+
+/* ---------- 潛力天花板：OOTP 式洗牌，數字對玩家隱藏（對應 WIKI 三） ----------
+   洗牌後：1項頂尖(72-80)、1項優質(64-74)、其餘4項平庸(46-62)。
+   60% 機率把「教學能力」強制排到頂尖位，40% 完全隨機。 */
+function rollPotential(){
   let sh;
   if(chance(60)){
-    const forced=pick(pool);
-    const rest=AB_KEYS.filter(k=>k!==forced);
-    for(let i=rest.length-1;i>0;i--){const j=Math.floor(R()*(i+1));const t=rest[i];rest[i]=rest[j];rest[j]=t;}
-    sh=[forced,...rest];
+    const rest=AB_KEYS.filter(k=>k!=='pro');
+    for(let i=rest.length-1;i>0;i--){ const j=Math.floor(R()*(i+1)); const t=rest[i]; rest[i]=rest[j]; rest[j]=t; }
+    sh=['pro',...rest];
   } else {
     sh=AB_KEYS.slice();
-    for(let i=sh.length-1;i>0;i--){const j=Math.floor(R()*(i+1));const t=sh[i];sh[i]=sh[j];sh[j]=t;}
+    for(let i=sh.length-1;i>0;i--){ const j=Math.floor(R()*(i+1)); const t=sh[i]; sh[i]=sh[j]; sh[j]=t; }
   }
   const pot={};
-  sh.forEach((k,i)=>{ pot[k]= i===0?ri(72,80) : i===1?ri(64,74) : i===2?ri(56,68) : ri(46,62); });
-  return {name,subject,teachStage,age:23,year:2026,startYear:2026,phase:'實習',phaseYr:1,
-    pot,potSum0:Object.values(pot).reduce((a,b)=>a+b,0),
-    ab,carry:{},job:null,region:null,school:null,salary:0,
-    univTier:univ.key,univTierName:univ.n,univSchool,teachYears:0,svc:0,
-    ow:0,homeroomYrsLeft:0,hrPoints:0,leadYears:0,deptYears:0,
-    hrYearsTotal:0,adminDutyYearsTotal:0,recentD:[],
-    deptCandidate:false,deptOffice:null,deptOfficesHeld:{},mgmtLowStreak:0,stableYears:0,
-    owBigCount:0,owStreak:0,owLeaveTaken:false,sickLeaveYears:0,intensity:null,traits:{},
-    schoolYears:0,prevSchool:null,everAdmin:false,firstRegion:null,subYearsTotal:0,
-    sixCount:0,safeCount:0,partyFailCount:0,miscFailCount:0,
-    crisisBoldStreak:0,crisisBoldFailTotal:0,healthyStreak:0,focusStreak:0,
-    bigInjEarlyCount:0,complainCount:0,refusedTransferPending:null,dictNick:null,
-    svcTotal:0,leadYearsTotal:0,deptYearsTotal:0,principalYearsTotal:0,
-    principalCandidate:false,everFormal:false,
-    awardCount:0,honorScore:0,awardsWon:{},excellentSchools:{},schoolYearsMap:{},
-    log:[],done:false};
+  sh.forEach((k,i)=>{ pot[k]= i===0?ri(72,80) : i===1?ri(64,74) : ri(46,62); });
+  return pot;
+}
+
+export function newState(name,subject){
+  const ab=rollBirthAbilities();
+  const pot=rollPotential();
+  const investedPoints={}; AB_KEYS.forEach(k=>investedPoints[k]=0);
+  return {
+    name,subject,teachStage:'國中',
+    age:23,year:2026,startYear:2026,
+    phase:'實習',phaseYr:1,
+    ab,pot,carry:{},investedPoints,
+    job:null,region:null,school:null,
+    teachYears:0,svc:0,svcTotal:0,
+    ow:0,
+    homeroomYrsLeft:0,hrPoints:0,hrYearsTotal:0,
+    leadYears:0,leadYearsTotal:0,adminDutyYearsTotal:0,
+    deptYears:0,deptYearsTotal:0,deptCandidate:false,deptOffice:null,deptOfficesHeld:{},
+    principalYearsTotal:0,principalCandidate:false,
+    dirCleanTenure:true,prinCleanTenure:true,
+    mgmtLowStreak:0,stableYears:0,
+    owBigCount:0,owStreak:0,owLeaveTaken:false,sickLeaveYears:0,
+    intensity:null,traits:{},
+    schoolYears:0,prevSchool:null,everAdmin:false,firstRegion:null,
+    subYearsTotal:0,everFormal:false,
+    sixCount:0,crisisBoldStreak:0,crisisBoldFailTotal:0,
+    healthyStreak:0,focusStreak:0,bigInjEarlyCount:0,complainCount:0,
+    refusedTransferPending:null,
+    recentD:[],
+    careerScore:0,honorScore:0,awardCount:0,awardsWon:{},
+    log:[],done:false,
+  };
 }

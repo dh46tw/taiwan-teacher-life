@@ -1,0 +1,26 @@
+{
+  "name": "TeacherLife 台灣教師人生模擬器",
+  "short_name": "TeacherLife",
+  "description": "從教育實習到退休，一場種子化的台灣教師生涯模擬。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1b2a",
+  "theme_color": "#0d1b2a",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='28' fill='%230d1b2a'/%3E%3Crect x='28' y='58' width='136' height='92' rx='10' fill='%23163049' stroke='%23ffc95c' stroke-width='4'/%3E%3Cpath d='M48 86 L144 86 M48 108 L112 108' stroke='%23eef1ea' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='74' fill='%230d1b2a'/%3E%3Crect x='75' y='154' width='362' height='245' rx='27' fill='%23163049' stroke='%23ffc95c' stroke-width='10'/%3E%3Cpath d='M128 229 L384 229 M128 288 L299 288' stroke='%23eef1ea' stroke-width='18' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

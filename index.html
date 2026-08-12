@@ -14,6 +14,10 @@
 <meta name="twitter:description" content="從教育實習到退休，一場種子化的台灣教師生涯模擬。教甄、介聘、過勞、隱藏特性、退休——每一個決定都算數。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%224%22 y=%228%22 width=%2224%22 height=%2216%22 rx=%222%22 fill=%22%23163049%22 stroke=%22%23ffc95c%22/%3E%3Cpath d=%22M9 14 L23 14 M9 18 L18 18%22 stroke=%22%23eef1ea%22 stroke-width=%221.5%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%224%22 y=%228%22 width=%2224%22 height=%2216%22 rx=%222%22 fill=%22%23163049%22 stroke=%22%23ffc95c%22/%3E%3Cpath d=%22M9 14 L23 14 M9 18 L18 18%22 stroke=%22%23eef1ea%22 stroke-width=%221.5%22/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TeacherLife">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -32,10 +36,6 @@
         <button data-v="國文" class="on">國文</button><button data-v="英文">英文</button>
         <button data-v="數學">數學</button><button data-v="理化">理化</button><button data-v="社會">社會</button>
       </div></div>
-    <div class="field"><label>任教階段</label>
-      <div class="seg two" id="seg-stage">
-        <button data-v="國中" class="on">國中</button><button data-v="高中">高中</button>
-      </div></div>
     <button class="btn main" style="margin-top:28px" id="btn-start">開始生涯 ▸ 教育實習</button>
     <p class="seedline">世界種子
       <input id="seed-show" maxlength="24" style="width:120px;background:#0e2034;color:#ffc95c;border:1px solid #2b4560;border-radius:6px;padding:2px 6px;font-family:inherit;font-size:12px;text-align:center">
@@ -44,12 +44,12 @@
 </div>
 <div id="app">
   <header id="board" style="display:none">
-    <div id="bd-top"><div id="bd-name"></div><div id="bd-team"></div><button id="btn-restart" title="重新開始">↺</button></div>
+    <div id="bd-top"><div id="bd-name"></div><div id="bd-team"></div><span id="bd-ow" class="ow-badge"></span><button id="btn-restart" title="重新開始">↺</button></div>
     <div id="bd-grid">
       <div class="bd-cell"><b id="bd-age">18</b><span>年齡</span></div>
       <div class="bd-cell"><b id="bd-year">2026</b><span>年份</span></div>
       <div class="bd-cell"><b id="bd-ovr">30</b><span>教學評價</span></div>
-      <div class="bd-cell"><b id="bd-sal">0</b><span>生涯薪(萬)</span></div>
+      <div class="bd-cell"><b id="bd-sal">0</b><span>教育積分</span></div>
     </div>
     <div id="lamps">
       <span class="lamp" id="lp0"><i></i>開學期</span>
@@ -62,5 +62,10 @@
   <footer id="act" style="display:none"></footer>
 </div>
 <script type="module" src="src/main.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+</script>
 </body>
 </html>
