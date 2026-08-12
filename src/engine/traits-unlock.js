@@ -34,7 +34,7 @@ export function checkLateBloom(ovrBefore,totalGot){
     if(S.pot)S.pot[k]=Math.min(80,(S.pot[k]||62)+10);
     const g=addAb(k,5);
     S.traits=S.traits||{}; S.traits.late=true;
-    card('gold','隱藏特性解鎖：大器晚成',`厚積薄發，這一年徹底逆襲——<b class="hl">訓練骰永久 ≥3 點、事件卡好結果機率提升至 70%</b>，${ABL[k]}潛力上限 <b class="up">+10</b> 且當場 <b class="up">${g>0?'+'+g:g}</b>。`);
+    card('gold','隱藏特性解鎖：大器晚成',`蓄勢待發，這一年徹底逆襲——<b class="hl">經驗骰永久 ≥3 點、事件卡好結果機率提升至 70%</b>，${ABL[k]}潛力上限 <b class="up">+10</b> 且當場 <b class="up">${g>0?'+'+g:g}</b>。`);
     board(0);
   }
 }

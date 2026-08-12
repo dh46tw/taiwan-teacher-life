@@ -32,7 +32,7 @@ export function trainAb(k,v){
   return got;
 }
 export function rollOneDie(){
-  if(S.traits&&S.traits.late)return ri(3,6); /* 大器晚成：訓練骰永久 ≥3 點 */
+  if(S.traits&&S.traits.late)return ri(3,6); /* 大器晚成：經驗骰永久 ≥3 點 */
   return ri(1,6);
 }
 export function genDice(n){
