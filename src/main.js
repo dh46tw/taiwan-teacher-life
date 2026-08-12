@@ -2,6 +2,7 @@ import { SEED, setSeed, seedInit } from './engine/rng.js';
 import { APP_VER, newState, setState } from './engine/state.js';
 import { internFlow, yearHeader } from './engine/career-flow.js';
 import { $, card, board, divider, confirmModal } from './ui/render.js';
+import { randomName } from './data/names.js';
 
 /* ================= 開場設定 ================= */
 (function(){ const t=document.getElementById('act-toggle');
@@ -16,10 +17,11 @@ document.querySelectorAll('#seg-subj button').forEach(b=>b.onclick=()=>{
   b.classList.add('on'); selSubj=b.dataset.v;
 });
 $('btn-start').onclick=()=>{
-  const nm=$('in-name').value.trim()||'陳靖雯';
+  const typed=$('in-name').value.trim();
   const sv=$('seed-show').value.trim(); if(sv)setSeed(sv);
   history.replaceState(null,'','?seed='+encodeURIComponent(SEED));
   seedInit(SEED);
+  const nm=typed||randomName();
   const S=newState(nm,selSubj);
   setState(S);
   $('start').style.display='none';
