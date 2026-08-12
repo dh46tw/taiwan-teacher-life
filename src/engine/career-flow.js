@@ -229,14 +229,17 @@ function homeroomStep(next){
   const canAdmin=S.deptCandidate||mgmtVFor('組長')>=40;
   const opts=[
     {t:'繼續接任導師（再帶一屆）',main:true,f:()=>{ S.homeroomYrsLeft=3; card('info','職務重分配會議',`第 ${S.hrPoints} 屆帶完，決定再帶一屆，導師之路還很長。`); board(0); next(); }},
-    {t:'休息一年轉任科任',f:()=>{ S.job='科任'; card('info','職務重分配會議','這屆帶完，申請暫時轉任科任喘口氣。'); board(0); next(); }},
+    {t:'休息一年轉任科任',f:()=>{ S.job='科任'; S.hrReassignCooldown=true; card('info','職務重分配會議','這屆帶完，申請暫時轉任科任喘口氣。'); board(0); next(); }},
   ];
   if(canAdmin)opts.push({t:'爭取行政職缺',f:()=>{ S.job='科任'; card('info','職務重分配會議','決定把重心放到行政職缺爭取上，暫時轉任科任待命。'); board(0); next(); }});
   choose(`職務重分配會議：導師積分 ${S.hrPoints}`,opts);
 }
-/* 組長邀約制：主任依溝通能力/表現發出邀約，離島偏鄉婉拒成功率 −25%（對應 WIKI 五、四） */
+/* 組長邀約制：主任依溝通能力/表現發出邀約，離島偏鄉婉拒成功率 −25%（對應 WIKI 五、四）。
+   hrReassignCooldown：剛結束一屆導師並選擇「休息一年轉任科任」時，本年度不會被立即指派回導師
+   （否則會在同一場職務重分配會議裡直接推翻玩家剛做的決定，對應試玩回報的 Bug） */
 function adminAssignStep(next){
   if(S.job!=='科任'){ next(); return; }
+  const skipHrReassign=!!S.hrReassignCooldown; S.hrReassignCooldown=false;
   const isRural=S.region==='離島偏鄉';
   const inviteProb=clamp(Math.round(mgmtVFor('組長')*1.1)+(isRural?15:0),5,65);
   if(chance(inviteProb)){
@@ -255,7 +258,7 @@ function adminAssignStep(next){
     return;
   }
   const hrProb=clamp(70-(S.hrPoints||0)*15,20,90);
-  if(chance(hrProb)){
+  if(!skipHrReassign&&chance(hrProb)){
     S.job='導師'; S.homeroomYrsLeft=3;
     card('info','職務異動',`新學年校方指派你擔任 <b class="hl">導師</b>，開始新一屆三年帶班。`);
     board(0);

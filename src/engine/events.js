@@ -84,8 +84,10 @@ export function subjectPool(){
   return TEACHER_EVENTS.filter(e=>e.subject===S.subject);
 }
 
-function applyMandatoryCost(ev,tier){
-  if(isPassionPrimary(ev)){
+function applyMandatoryCost(ev,tier,fx){
+  /* 本次觸發效果本身就有動到教學熱誠（無論是否為唯一獎勵）：必然代價改記在過勞量表，
+     避免對同一項屬性疊加兩筆相反方向的增減（曾造成「熱誠+1／熱誠-1」同時出現的顯示與計算錯誤） */
+  if(isPassionPrimary(ev)||Object.prototype.hasOwnProperty.call(fx,'pas')){
     const delta=TIER_OW_COST_IF_PASSION[tier];
     if(delta>0){ S.ow=(S.ow||0)+delta; return `過勞量表 <b class="dn">+${delta}</b>`; }
     return null;
@@ -114,7 +116,7 @@ export function resolveEvent(ev,tier,after){
     const g=addAb(key,v);
     out.push(`${ABL[key]} <b class="${g>0?'up':g<0?'dn':'hl'}">${g>0?'+'+g:g<0?g:'蓄力中'}</b>`);
   }
-  const costLine=applyMandatoryCost(ev,tier);
+  const costLine=applyMandatoryCost(ev,tier,fx);
   if(costLine)out.push(costLine);
   /* 事件卡計分（對應 WIKI 六） */
   if(ROLE_TAGS.includes(ev.for)){
