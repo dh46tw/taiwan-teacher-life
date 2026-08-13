@@ -17,7 +17,6 @@ function tierProbOffset(tier){
 }
 const TIER_PASSION_COST={low:0,mid:-1,high:-2};
 const TIER_OW_COST_IF_PASSION={low:0,mid:3,high:6}; /* 主獎勵本身是教學熱忱時的替代代價 */
-const TIER_LABEL={low:'低投入',mid:'中投入',high:'高投入'};
 
 /* 事件卡如何計分（對應 WIKI 六）：一般卡直接計入 CareerScore；職務限定卡先累進本年度 yearRoleScore，
    由 career-flow 在年末依職務公式結算。基礎係數與失敗扣分倍數 WIKI 未給精確數字，為起始數值待試玩校準。 */
@@ -97,9 +96,26 @@ function applyMandatoryCost(ev,tier,fx){
   return null;
 }
 
+/* 找出這張卡「主看」的能力值：g 物件裡第一個非 rand/ow 的 key；純隨機卡（g:{rand:...}）回傳 null，不受能力值影響 */
+function themeKey(ev){
+  const keys=Object.keys(ev.g).filter(k=>k!=='rand'&&k!=='ow');
+  return keys[0]||null;
+}
+/* 能力值對成功率的加成：用「目前值/潛力天花板」的相對位置換算，比用絕對數字公平（不同人潛力天花板高低不同，見 WIKI 三）。
+   ratio=0.5（值恰為潛力一半）時加成為0，維持原本只吃 tier 的機率。潛力天花板本身對玩家隱藏，這裡只內部使用，不對外顯示數字。
+   起始數值，待試玩校準。 */
+function abilityProbBonus(ev){
+  const key=themeKey(ev);
+  if(!key)return 0;
+  const cur=S.ab[key], pot=(S.pot&&S.pot[key])||62;
+  return clamp(Math.round((cur/pot-0.5)*24),-10,10);
+}
+export function eventProb(ev,tier){
+  return clamp(eventBase()+abilityProbBonus(ev)+tierProbOffset(tier),5,95);
+}
+
 export function resolveEvent(ev,tier,after){
-  const base=eventBase();
-  const prob=clamp(base+tierProbOffset(tier),5,95);
+  const prob=eventProb(ev,tier);
   const good=chance(prob);
   const fx=good?ev.g:ev.b;
   const explicitKeys=Object.keys(fx).filter(k=>k!=='rand'&&k!=='ow');
@@ -137,7 +153,7 @@ export function resolveEvent(ev,tier,after){
     S.nationalContestThisYear=true;
     out.push(`🏆 指導學生獲全國賽（${SUBJ_CONTEST[ev.subject]||''}）教育積分 <b class="up">+90</b>`);
   }
-  card(good?'good':'bad',`事件｜${ev.n}（${TIER_LABEL[tier]}）`,`${good?ev.gt:ev.bt}<br>${out.join('、')}`);
+  card(good?'good':'bad',`事件｜${ev.n}`,`${good?ev.gt:ev.bt}<br>${out.join('、')}`);
   board(1);
   trackCrisisBold(ev,tier,good);
   after(good,ev,tier);
@@ -146,11 +162,12 @@ export function resolveEvent(ev,tier,after){
 export function drawEventFrom(pool,after){
   const list=pool.length?pool:mainPool();
   const ev=weightedPick(list,regionWeight);
-  const base=eventBase();
-  choose(`事件｜${ev.n} — 你要怎麼應對？`,[
-    {t:ev.opts[0],s:`成功率 ${clamp(base+tierProbOffset('low'),5,95)}%｜效果最小`,f:()=>resolveEvent(ev,'low',after)},
-    {t:ev.opts[1],main:true,s:`成功率 ${clamp(base+tierProbOffset('mid'),5,95)}%｜標準效果`,f:()=>resolveEvent(ev,'mid',after)},
-    {t:ev.opts[2],warn:true,s:`成功率 ${clamp(base+tierProbOffset('high'),5,95)}%｜效果最大`,f:()=>resolveEvent(ev,'high',after)},
+  const key=themeKey(ev);
+  const themeLine=key?`<br><small style="opacity:.6">本次事件主要看：${ABL[key]}（目前 ${S.ab[key]}）</small>`:'';
+  choose(`事件｜${ev.n} — 你要怎麼應對？${themeLine}`,[
+    {t:ev.opts[0],s:`成功率 ${eventProb(ev,'low')}%｜效果最小`,f:()=>resolveEvent(ev,'low',after)},
+    {t:ev.opts[1],main:true,s:`成功率 ${eventProb(ev,'mid')}%｜標準效果`,f:()=>resolveEvent(ev,'mid',after)},
+    {t:ev.opts[2],warn:true,s:`成功率 ${eventProb(ev,'high')}%｜效果最大`,f:()=>resolveEvent(ev,'high',after)},
   ]);
 }
 /* 學期中事件：先抽通用/職務限定卡；科目專屬卡獨立機率額外觸發一次 */
