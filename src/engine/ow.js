@@ -148,17 +148,20 @@ export function rollInjury(after){
     board(1); after(false);
   }
 }
-/* 衰退曲線：健康≥65延後2年觸發；健康<40提前2年觸發且幅度×1.5（對應 WIKI 七） */
+/* 衰退曲線：健康≥65延後2年觸發；健康<40提前2年觸發且幅度×1.5（對應 WIKI 七）。
+   幅度封頂＋健康自身衰退減半：避免「健康差→衰退更早更重→健康更差」的自我加速迴圈，
+   讓晚年不會必然被拖到六維全滅、失去可玩性（對應試玩回報：65歲健康全程滿分的角色衰退曲線仍會把六維扣到見底）。 */
 export function applyDecline(){
   const hp=S.ab.hp;
   const delay=hp>=65?2:(hp<40?-2:0);
   const magMult=hp<40?1.5:1;
   const mildStart=52+delay, severeStart=55+delay;
   if(S.age<mildStart)return;
-  let dec=S.age>=severeStart?5+(S.age-severeStart):2;
+  let dec=S.age>=severeStart?Math.min(2+(S.age-severeStart),5):2;
   dec=Math.round(dec*magMult);
-  AB_KEYS.forEach(k=>{ S.ab[k]=clamp(S.ab[k]-dec,1,80); });
-  card('bad','歲月不饒人',`${S.age>=severeStart?'衰退加劇期':'體力漸不如前'}：各項能力 <b class="dn">−${dec}</b>${hp>=65?'（健康狀況佳，衰退已延後）':hp<40?'（健康狀況不佳，衰退提前且加劇）':''}。`);
+  const hpDec=Math.max(1,Math.round(dec/2));
+  AB_KEYS.forEach(k=>{ const d=k==='hp'?hpDec:dec; S.ab[k]=clamp(S.ab[k]-d,1,80); });
+  card('bad','歲月不饒人',`${S.age>=severeStart?'衰退加劇期':'體力漸不如前'}：健康 <b class="dn">−${hpDec}</b>、其餘能力各 <b class="dn">−${dec}</b>${hp>=65?'（健康狀況佳，衰退已延後）':hp<40?'（健康狀況不佳，衰退提前且加劇）':''}。`);
   board(0);
 }
 export function handleSickLeaveYear(){

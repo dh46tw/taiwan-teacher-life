@@ -71,11 +71,12 @@ export function retireEligible(){
   const voluntary=(S.teachYears||0)>=25
     || ((S.svcTotal||0)>=5&&S.age>=60)
     || ((S.svcTotal||0)>=15&&(S.owBigCount||0)>=2);
-  const byAge=(S.svcTotal||0)>=5&&S.age>=65;
+  /* 65 歲為硬性年齡上限：無論是否曾任正職（服務年資是否達標），到齡一律強制退休，避免萬年代理年齡無上限地一直往上跑 */
+  const byAge=S.age>=65;
   return {voluntary,byAge};
 }
 const RETIRE_TEXT={
-  byAge:{title:'屆齡退休',body:'服務年資與年齡皆已達屆齡退休門檻，學校依規定辦理退休。'},
+  byAge:{title:'屆齡退休',body:'已達 65 歲屆齡退休上限，學校依規定辦理退休。'},
   voluntary:{title:'自願退休',body:'年資或年齡已達自願退休條件，決定為這段教職生涯畫下句點。'},
 };
 export function endGameRetire(kind){

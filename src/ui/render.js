@@ -45,7 +45,7 @@ export function owStatusClass(){
   return r>=0.85?'ow-bad':r>=0.6?'ow-warn':'ow-ok';
 }
 export function board(phase){
-  $('bd-name').innerHTML=`${S.name}<small>${S.subject}科・${S.teachStage}・${jobLabel()}</small>`;
+  $('bd-name').innerHTML=`${S.name}<small>${S.subject}科・${jobLabel()}</small>`;
   $('bd-team').innerHTML=`<span style="color:var(--amber)">${locLabel()}</span>`;
   $('bd-age').textContent=S.age; $('bd-year').textContent=S.year;
   $('bd-ovr').textContent=ovr(); $('bd-sal').textContent=Math.round(S.careerScore||0).toLocaleString();

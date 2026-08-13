@@ -1,6 +1,6 @@
 import { S, APP_VER } from '../engine/state.js';
 import { SEED, pick, clamp } from '../engine/rng.js';
-import { totalScore, finalTier } from '../engine/summary.js';
+import { totalScore, finalTier, flavorOf } from '../engine/summary.js';
 import { finalJobLabel, honorsList } from '../engine/summary.js';
 import { card, board, divider, choose, scrollBottom, logTarget } from './render.js';
 import { ABL, AB_KEYS } from '../data/tables.js';
@@ -74,7 +74,7 @@ export function shareImage(out){
   function sectionTitle(t){ c.fillStyle='#8ea3ae'; c.font='bold 13px sans-serif'; c.fillText(t,PAD,y); y+=22; }
 
   hr(); sectionTitle('生涯評價');
-  c.font='bold 16px sans-serif'; c.fillStyle='#ffc95c'; c.fillText('★ '+tier,PAD,y); y+=24;
+  c.font='bold 16px sans-serif'; c.fillStyle='#ffc95c'; c.fillText('★ '+tier+'・'+flavorOf(),PAD,y); y+=24;
   c.font='13px monospace'; c.fillStyle='#eef1ea';
   c.fillText(`CareerScore ${Math.round(cs)}　HonorScore ${hs}`,PAD,y); y+=24;
   c.fillText(`教育積分總分 ${Math.round(total)}`,PAD,y); y+=30;
